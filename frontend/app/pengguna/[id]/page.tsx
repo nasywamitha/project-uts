@@ -3,25 +3,40 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
-import Header from '@/components/Header';
 import { 
-  ArrowLeft, Download, Ban, User, Edit3, CheckCircle2, ArrowRight 
+  ArrowLeft, Ban, User, Edit3, CheckCircle2, ArrowRight 
 } from 'lucide-react';
 
-export default function UserDetailPage({ params }: { params: { id: string } }) {
+interface UserDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function UserDetailPage({ params }: UserDetailPageProps) {
+  const [userId, setUserId] = useState<string>('');
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    fetch(`/api/users/${params.id}`)
+    params.then((resolvedParams) => {
+      setUserId(resolvedParams.id);
+    });
+  }, [params]);
+
+  useEffect(() => {
+    if (!userId) return;
+    
+    fetch(`/api/users/${userId}`)
       .then((res) => res.json())
-      .then((resData) => setUser(resData.data));
-  }, [params.id]);
+      .then((resData) => setUser(resData.data))
+      .catch((err) => console.error("Gagal memuat data user:", err));
+  }, [userId]);
 
   if (!user) {
     return (
       <div className="flex min-h-screen bg-white text-gray-800">
         <Sidebar />
-        <main className="flex-1 p-8 bg-white"><Header /><p>Memuat data pengguna...</p></main>
+        <main className="flex-1 p-8 bg-white">
+          <p>Memuat data pengguna...</p>
+        </main>
       </div>
     );
   }
@@ -30,7 +45,6 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
     <div className="flex min-h-screen bg-white text-gray-800">
       <Sidebar />
       <main className="flex-1 p-8 bg-white">
-        <Header />
 
         {/* Back Link */}
         <Link href="/pengguna" className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 mb-4 font-medium">
@@ -44,9 +58,7 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
             <p className="text-xs text-gray-400 mt-1">Rincian profil, sinkronisasi alokasi mobile app, dan log aktivitas pengguna.</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 font-semibold text-xs rounded-xl hover:bg-gray-50">
-              <Download className="w-4 h-4" /> Ekspor PDF
-            </button>
+            {/* Tombol Ekspor PDF sudah dihapus */}
             <button className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-500 font-semibold text-xs rounded-xl hover:bg-red-100">
               <Ban className="w-4 h-4" /> Bekukan Akun
             </button>
@@ -141,7 +153,7 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {user.activities.map((act: any, idx: number) => (
+              {user.activities?.map((act: any, idx: number) => (
                 <tr key={idx} className="hover:bg-gray-50/60">
                   <td className="p-4 pl-4 text-gray-500 font-medium">{act.date}</td>
                   <td className="p-4 font-bold text-gray-800">{act.action}</td>

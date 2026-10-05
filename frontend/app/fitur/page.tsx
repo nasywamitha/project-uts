@@ -116,9 +116,12 @@ export default function FeatureUsagePage() {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3 flex justify-between items-center text-xs border border-gray-100">
-              <span className="text-gray-500 font-medium">Diversifikasi Fitur</span>
-              <span className="text-indigo-600 font-bold bg-indigo-50 px-2.5 py-1 rounded-lg">Kategori Sehat (6 modul aktif)</span>
+            
+            {/* Badge Kategori Sehat di tengah dengan latar belakang ungu muda */}
+            <div className="flex justify-center mt-4">
+              <div className="bg-indigo-50/70 rounded-xl px-4 py-2.5 text-xs font-bold text-emerald-700 w-full text-center border border-indigo-100/50">
+                Kategori Sehat (6 modul aktif)
+              </div>
             </div>
           </div>
         </div>
