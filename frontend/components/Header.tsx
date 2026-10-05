@@ -42,9 +42,9 @@ export default function Header() {
   ];
 
   return (
-    <header className="flex justify-between items-center mb-8 relative">
+    <header className="flex justify-between items-center gap-2 sm:gap-4 mb-6 sm:mb-8 relative">
      {/* Input Pencarian Global Header */}
-<div className="relative w-72 sm:w-96">
+<div className="relative w-32 sm:w-72 lg:w-96 shrink">
   <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
   <input
     type="text"
@@ -54,7 +54,7 @@ export default function Header() {
 </div>
 
       {/* Notifikasi & Profil Admin */}
-      <div className="flex items-center gap-4 relative">
+      <div className="flex items-center gap-2 sm:gap-4 relative shrink-0">
         {/* Tombol Lonceng Notifikasi */}
         <div className="relative">
           <button
@@ -71,7 +71,7 @@ export default function Header() {
 
           {/* Dropdown Menu Notifikasi */}
           {isOpen && (
-            <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl border border-gray-200 shadow-xl z-50 overflow-hidden">
+            <div className="absolute right-0 mt-3 w-[min(20rem,calc(100vw-5rem))] bg-white rounded-2xl border border-gray-200 shadow-xl z-50 overflow-hidden">
               <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <div className="flex items-center gap-2">
                   <h4 className="font-bold text-xs text-gray-800">Notifikasi</h4>

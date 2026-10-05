@@ -34,7 +34,7 @@ export default function UsersPage() {
   return (
     <div className="flex min-h-screen bg-white text-gray-800">
       <Sidebar />
-      <main className="flex-1 p-8 bg-white">
+      <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8 bg-white">
         <Header />
 
         {/* Page Header */}
@@ -54,7 +54,7 @@ export default function UsersPage() {
             </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs flex justify-between items-center">
             <div>
               <p className="text-[10px] font-bold text-gray-400 tracking-wider mb-1">TOTAL TERDAFTAR</p>
@@ -89,10 +89,10 @@ export default function UsersPage() {
         </div>
 
         {/* Table Container */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-5">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-4 sm:p-5">
           {/* Table Controls */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="relative w-80">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+            <div className="relative w-full lg:max-w-80">
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
               <input
                 type="text"
@@ -103,7 +103,7 @@ export default function UsersPage() {
               />
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between sm:justify-start gap-3">
               <div className="flex bg-gray-100 p-1 rounded-xl">
                 {(['Semua', 'Aktif', 'Nonaktif'] as const).map((tab) => (
                   <button
@@ -125,7 +125,8 @@ export default function UsersPage() {
           </div>
 
           {/* Table */}
-          <table className="w-full text-left text-xs text-gray-600">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[680px] text-left text-xs text-gray-600">
             <thead className="bg-gray-50 text-[11px] text-gray-400 uppercase font-semibold border-b border-gray-200">
               <tr>
                 <th className="p-3 pl-4">NO</th>
@@ -142,7 +143,7 @@ export default function UsersPage() {
                   <td className="p-4 pl-4 text-gray-400">{user.no}</td>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${user.avatarBg}`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs ${user.avatarBg}`}>
                         {user.initials}
                       </div>
                       <span className="font-bold text-gray-800">{user.name}</span>
@@ -153,14 +154,14 @@ export default function UsersPage() {
                     <span className={`px-3 py-1 rounded-full text-[11px] font-semibold inline-block ${
                       user.status === 'Aktif' ? 'bg-emerald-100/70 text-emerald-600' : 'bg-red-100/70 text-red-500'
                     }`}>
-                      ● {user.status}
+                      {user.status}
                     </span>
                   </td>
                   <td className="p-4 text-gray-500">{user.registerDate}</td>
                   <td className="p-4 text-right pr-4 space-x-2">
                     <Link
                       href={`/pengguna/${user.id}`}
-                      className="px-3 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-xs font-semibold inline-block"
+                      className="px-3 py-1 bg-amber-500 text-white hover:bg-indigo-100 rounded-lg text-xs font-semibold inline-block"
                     >
                       Detail
                     </Link>
@@ -172,9 +173,10 @@ export default function UsersPage() {
               ))}
             </tbody>
           </table>
+          </div>
 
           {/* Pagination */}
-          <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100 text-xs text-gray-400">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-6 pt-4 border-t border-gray-100 text-xs text-gray-400">
             <p>Menampilkan 1 hingga {filteredUsers.length} dari 1.250 total akun</p>
             <div className="flex items-center gap-2 font-semibold">
               <button className="p-1 text-gray-300"><ChevronLeft className="w-4 h-4" /></button>

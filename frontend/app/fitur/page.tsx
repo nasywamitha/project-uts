@@ -31,26 +31,26 @@ export default function FeatureUsagePage() {
   return (
     <div className="flex min-h-screen bg-white text-gray-800">
       <Sidebar />
-      <main className="flex-1 p-8 bg-white">
+      <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8 bg-white">
         <Header />
 
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Statistik Penggunaan Fitur</h1>
             <p className="text-xs text-gray-400 mt-1">Lihat seberapa sering fitur aplikasi digunakan oleh pengguna.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <button className="flex items-center justify-center gap-2 px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50">
               <Calendar className="w-4 h-4 text-amber-500" /> 1 Sep 2026 - 30 Sep 2026
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50">
+            <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50">
               <Download className="w-4 h-4" /> Ekspor
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6 mb-6">
-          <div className="col-span-7 bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+          <div className="min-w-0 bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between">
             <div>
               <h3 className="font-bold text-gray-800 text-sm">Jumlah Penggunaan Fitur</h3>
               <p className="text-xs text-gray-400 mt-0.5">Frekuensi eksekusi fitur inti per 30 hari</p>
@@ -69,7 +69,7 @@ export default function FeatureUsagePage() {
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-xs">
+            <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 text-xs">
               <p className="text-gray-500 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
                 Fitur pencatatan menyumbang volume interaksi harian terbesar (+28%)
@@ -78,7 +78,7 @@ export default function FeatureUsagePage() {
             </div>
           </div>
 
-          <div className="col-span-5 bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between">
+          <div className="min-w-0 bg-white p-4 sm:p-6 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-2">
                 <div>
@@ -87,8 +87,8 @@ export default function FeatureUsagePage() {
                 </div>
                 <button className="text-gray-400 hover:text-gray-600"><MoreVertical className="w-4 h-4" /></button>
               </div>
-              <div className="grid grid-cols-12 items-center my-4">
-                <div className="col-span-6 h-48 relative flex items-center justify-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 items-center my-4">
+                <div className="h-48 relative flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={data?.pieChart} innerRadius={55} outerRadius={75} paddingAngle={3} dataKey="percentage">
@@ -103,7 +103,7 @@ export default function FeatureUsagePage() {
                     <p className="text-[10px] text-gray-400 font-medium">Total Aktivitas</p>
                   </div>
                 </div>
-                <div className="col-span-6 space-y-2 pl-2">
+                <div className="space-y-2 sm:pl-2">
                   {data?.pieChart.map((item: any) => (
                     <div key={item.name} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
@@ -118,16 +118,15 @@ export default function FeatureUsagePage() {
             </div>
             
             {/* Badge Kategori Sehat di tengah dengan latar belakang ungu muda */}
-            <div className="flex justify-center mt-4">
-              <div className="bg-indigo-50/70 rounded-xl px-4 py-2.5 text-xs font-bold text-emerald-700 w-full text-center border border-indigo-100/50">
-                Kategori Sehat (6 modul aktif)
-              </div>
+            <div className="bg-gray-50 rounded-xl p-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-xs border border-gray-100">
+              <span className="text-gray-500 font-medium">Diversifikasi Fitur</span>
+              <span className="text-indigo-600 font-bold bg-indigo-50 px-2.5 py-1 rounded-lg">Kategori Sehat (6 modul aktif)</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-6">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
             <div>
               <h3 className="font-bold text-gray-800 text-sm">Rincian Pertumbuhan Fitur (Month over Month)</h3>
               <p className="text-xs text-gray-400 mt-0.5">Tingkat retensi, jam puncak operasional, dan pertumbuhan performa fitur</p>
@@ -137,7 +136,8 @@ export default function FeatureUsagePage() {
             </button>
           </div>
 
-          <table className="w-full text-left text-xs text-gray-600">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[760px] text-left text-xs text-gray-600">
             <thead className="bg-gray-50 text-[11px] text-gray-400 uppercase font-semibold border-b border-gray-200">
               <tr>
                 <th className="p-3 pl-4">NAMA FITUR</th>
@@ -182,6 +182,7 @@ export default function FeatureUsagePage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </main>
     </div>

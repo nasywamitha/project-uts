@@ -40,30 +40,30 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-white text-gray-800">
       <Sidebar />
-      <main className="flex-1 p-8 bg-white">
+      <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8 bg-white">
         <Header />
 
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <button className="flex items-center justify-center gap-2 px-3.5 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50">
               <Calendar className="w-4 h-4 text-amber-500" /> Bulan Ini (Sep 2026)
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl text-xs font-semibold hover:bg-amber-600">
+            <button className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl text-xs font-semibold hover:bg-amber-600">
               <Download className="w-4 h-4" /> Unduh Laporan
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
           <StatCard title="TOTAL PENGGUNA" value={dashboardData.stats.totalPengguna} growth={dashboardData.stats.totalPenggunaGrowth} icon={Users} color="bg-amber-100 text-amber-600" />
           <StatCard title="PENGGUNA AKTIF" value={dashboardData.stats.penggunaAktif} growth={dashboardData.stats.penggunaAktifGrowth} icon={UserCheck} color="bg-emerald-100 text-emerald-600" />
           <StatCard title="PENGGUNA BARU" value={dashboardData.stats.penggunaBaru} growth={dashboardData.stats.penggunaBaruGrowth} icon={UserPlus} color="bg-sky-100 text-sky-600" />
           <StatCard title="TOTAL AKTIVITAS" value={dashboardData.stats.totalAktivitas} growth={dashboardData.stats.totalAktivitasGrowth} icon={Activity} color="bg-purple-100 text-purple-600" />
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mb-6">
-          <div className="col-span-2 bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+          <div className="xl:col-span-2 min-w-0 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h3 className="font-bold text-gray-800">Aktivitas Pengguna</h3>
@@ -89,7 +89,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
+          <div className="min-w-0 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
             <h3 className="font-bold text-gray-800">Penggunaan Fitur</h3>
             <p className="text-xs text-gray-400 mb-4">Fitur yang paling sering digunakan</p>
             <div className="space-y-3">
@@ -111,15 +111,16 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-5">
-          <div className="flex justify-between items-center mb-4">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-4 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
             <div>
               <h3 className="font-bold text-gray-800">Pengguna Terbaru</h3>
               <p className="text-xs text-gray-400">Akun yang baru terdaftar dalam 7 hari terakhir</p>
             </div>
             <button className="text-xs font-bold text-amber-600 hover:underline">Lihat Semua →</button>
           </div>
-          <table className="w-full text-left text-sm text-gray-600">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-sm text-gray-600">
             <thead className="bg-gray-50 text-xs text-gray-400 uppercase font-semibold">
               <tr>
                 <th className="p-3 rounded-l-xl">Nama</th>
@@ -150,6 +151,7 @@ export default function DashboardPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </main>
     </div>

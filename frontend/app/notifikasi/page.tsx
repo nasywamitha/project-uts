@@ -31,24 +31,24 @@ export default function NotificationsPage() {
   return (
     <div className="flex min-h-screen bg-white text-gray-800">
       <Sidebar />
-      <main className="flex-1 p-8 bg-white">
+      <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8 bg-white">
         <Header />
 
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Kelola Notifikasi & Konten</h1>
+            <h1 className="text-2xl font-bold text-gray-800">Kelola Notifikasi AI</h1>
             <p className="text-xs text-gray-400 mt-1">Atur pesan notifikasi, pengumuman, dan informasi aplikasi.</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white font-medium text-sm rounded-xl hover:bg-amber-600">
+          <button className="flex w-full sm:w-auto justify-center items-center gap-2 px-4 py-2.5 bg-amber-500 text-white font-medium text-sm rounded-xl hover:bg-amber-600">
             <Plus className="w-4 h-4" /> Buat Notifikasi
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-5">
-          <div className="flex justify-between items-center mb-6">
-            <button className="px-4 py-2 bg-amber-500 text-white font-semibold text-xs rounded-xl">Notifikasi AI</button>
-            <div className="flex items-center gap-3">
-              <div className="relative w-64">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-4 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+            <button className="px-4 py-2 bg-amber-500 text-white font-semibold text-xs rounded-xl">AI Notifikasi</button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="relative w-full sm:w-64">
                 <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
                 <input type="text" placeholder="Filter notifikasi..." className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-none" />
               </div>
@@ -58,7 +58,8 @@ export default function NotificationsPage() {
             </div>
           </div>
 
-          <table className="w-full text-left text-sm text-gray-600">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left text-sm text-gray-600">
             <thead className="bg-gray-50 text-[11px] text-gray-400 uppercase font-semibold border-b border-gray-200">
               <tr>
                 <th className="p-3 pl-4">ID</th>
@@ -96,8 +97,9 @@ export default function NotificationsPage() {
               ))}
             </tbody>
           </table>
+          </div>
 
-          <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100 text-xs text-gray-400">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-6 pt-4 border-t border-gray-100 text-xs text-gray-400">
             <p>Menampilkan 1–6 dari 24 entri notifikasi</p>
             <div className="flex items-center gap-2 font-semibold">
               <button className="p-1 text-gray-300"><ChevronLeft className="w-4 h-4" /></button>
