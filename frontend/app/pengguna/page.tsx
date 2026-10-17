@@ -166,7 +166,7 @@ export default function UsersPage() {
                       Detail
                     </Link>
                     <button className="text-gray-400 hover:text-gray-600 inline-block align-middle ml-1">
-                      <MoreVertical className="w-4 h-4" />
+ 
                     </button>
                   </td>
                 </tr>

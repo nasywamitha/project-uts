@@ -39,8 +39,9 @@ export default function NotificationsPage() {
             <h1 className="text-2xl font-bold text-gray-800">Kelola Notifikasi AI</h1>
             <p className="text-xs text-gray-400 mt-1">Atur pesan notifikasi, pengumuman, dan informasi aplikasi.</p>
           </div>
-          <button className="flex w-full sm:w-auto justify-center items-center gap-2 px-4 py-2.5 bg-amber-500 text-white font-medium text-sm rounded-xl hover:bg-amber-600">
-            <Plus className="w-4 h-4" /> Buat Notifikasi
+          <button className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition">
+            <Plus className="w-4 h-4" />
+            <span>Buat Notifikasi</span>
           </button>
         </div>
 
@@ -67,7 +68,6 @@ export default function NotificationsPage() {
                 <th className="p-3 text-center">TIPE</th>
                 <th className="p-3">TANGGAL</th>
                 <th className="p-3 text-center">STATUS</th>
-                <th className="p-3 text-right pr-4">AKSI</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -88,10 +88,6 @@ export default function NotificationsPage() {
                     <span className={`px-3 py-1 rounded-full text-[11px] font-semibold inline-block ${item.status === 'Aktif' ? 'bg-emerald-100/70 text-emerald-600' : 'bg-indigo-50/80 text-indigo-400'}`}>
                       {item.status}
                     </span>
-                  </td>
-                  <td className="p-4 text-right pr-4 space-x-2">
-                    <button className="text-xs font-semibold text-gray-600 hover:text-amber-600">Edit</button>
-                    <button className="text-gray-400 hover:text-gray-600 inline-block align-middle ml-1"><MoreVertical className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}

@@ -62,9 +62,11 @@ export default function CategoryPage() {
             <h1 className="text-2xl font-bold text-gray-800">Kategori Keuangan</h1>
             <p className="text-xs text-gray-400 mt-1">Kelola kategori yang tersedia di aplikasi.</p>
           </div>
-          <button className="flex w-full sm:w-auto justify-center items-center gap-2 px-4 py-2.5 bg-amber-500 text-white font-medium text-sm rounded-xl hover:bg-amber-600">
-            <Plus className="w-4 h-4" /> Tambah Kategori
-          </button>
+          {/* Tombol Tambah Kategori yang disamakan gaya dan font-nya */}
+<button className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition">
+  <Plus className="w-4 h-4" />
+  <span>Tambah Kategori</span>
+</button>
         </div>
 
         <div className="flex w-full sm:w-fit gap-2 mb-6 bg-gray-100 p-1 rounded-xl">

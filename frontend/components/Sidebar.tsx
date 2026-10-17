@@ -18,7 +18,6 @@ const menuItems = [
   { name: 'Kategori', href: '/kategori', icon: FolderTree },
   { name: 'AI Notifikasi', href: '/notifikasi', image: notificationsIcon },
   { name: 'Penggunaan Fitur', href: '/fitur', image: featureUsageIcon },
-  { name: 'Laporan', href: '/laporan', image: reportsIcon },
   { name: 'Pengaturan', href: '/pengaturan', image: settingsIcon },
 ];
 
