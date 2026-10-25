@@ -45,11 +45,45 @@ export default function CategoryPage() {
   const [activeTab, setActiveTab] = useState<'Pengeluaran' | 'Pemasukan'>('Pengeluaran');
   const [categories, setCategories] = useState<Category[]>([]);
 
-  useEffect(() => {
+  // State untuk mengontrol Pop-up Modal Hapus
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+  const fetchCategories = () => {
     fetch(`/api/categories?type=${activeTab}`)
       .then((res) => res.json())
       .then((data) => setCategories(data.data || []));
+  };
+
+  useEffect(() => {
+    fetchCategories();
   }, [activeTab]);
+
+  const openDeleteModal = (category: Category) => {
+    setSelectedCategory(category);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedCategory) return;
+
+    try {
+      const res = await fetch(`/api/categories/${selectedCategory.id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setIsDeleteModalOpen(false);
+        setSelectedCategory(null);
+        fetchCategories(); 
+      } else {
+        alert('Gagal menghapus kategori.');
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      alert('Terjadi kesalahan pada server.');
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-white text-gray-800">
@@ -62,18 +96,17 @@ export default function CategoryPage() {
             <h1 className="text-2xl font-bold text-gray-800">Kategori Keuangan</h1>
             <p className="text-xs text-gray-400 mt-1">Kelola kategori yang tersedia di aplikasi.</p>
           </div>
-          {/* Tombol Tambah Kategori yang disamakan gaya dan font-nya */}
-<button className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition">
-  <Plus className="w-4 h-4" />
-  <span>Tambah Kategori</span>
-</button>
+          <button className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer">
+            <Plus className="w-4 h-4" />
+            <span>Tambah Kategori</span>
+          </button>
         </div>
 
         <div className="flex w-full sm:w-fit gap-2 mb-6 bg-gray-100 p-1 rounded-xl">
-          <button onClick={() => setActiveTab('Pengeluaran')} className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 text-xs font-semibold rounded-lg transition ${activeTab === 'Pengeluaran' ? 'bg-amber-500 text-white' : 'text-gray-500'}`}>
+          <button onClick={() => setActiveTab('Pengeluaran')} className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 text-xs font-semibold rounded-lg transition cursor-pointer ${activeTab === 'Pengeluaran' ? 'bg-amber-500 text-white' : 'text-gray-500'}`}>
             Pengeluaran
           </button>
-          <button onClick={() => setActiveTab('Pemasukan')} className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 text-xs font-semibold rounded-lg transition ${activeTab === 'Pemasukan' ? 'bg-amber-500 text-white' : 'text-gray-500'}`}>
+          <button onClick={() => setActiveTab('Pemasukan')} className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 text-xs font-semibold rounded-lg transition cursor-pointer ${activeTab === 'Pemasukan' ? 'bg-amber-500 text-white' : 'text-gray-500'}`}>
             Pemasukan
           </button>
         </div>
@@ -124,8 +157,13 @@ export default function CategoryPage() {
                       </span>
                     </td>
                     <td className="p-4 text-right pr-6 space-x-3">
-                      <button className="text-xs font-semibold text-gray-00 hover:text-amber-600">Edit</button>
-                      <button className="text-xs font-semibold text-red-500 hover:text-red-700">Hapus</button>
+                      <button className="text-xs font-semibold text-gray-500 hover:text-amber-600 cursor-pointer">Edit</button>
+                      <button 
+                        onClick={() => openDeleteModal(item)}
+                        className="text-xs font-semibold text-red-500 hover:text-red-700 cursor-pointer"
+                      >
+                        Hapus
+                      </button>
                     </td>
                   </tr>
                 );
@@ -134,6 +172,37 @@ export default function CategoryPage() {
           </table>
         </div>
       </main>
+
+      {/* --- POP-UP MODAL KONFIRMASI HAPUS --- */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl border border-gray-100 text-center space-y-4">
+            <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto font-bold text-lg">
+              !
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-800 text-base">Hapus Kategori</h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Apakah Anda yakin ingin menghapus kategori <span className="font-semibold text-gray-700">"{selectedCategory?.name}"</span> ini?
+              </p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-md shadow-red-500/20"
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
