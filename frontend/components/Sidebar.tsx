@@ -8,12 +8,11 @@ import dashboardIcon from './assets/Windows 11.png';
 import usersIcon from './assets/User.png';
 import notificationsIcon from './assets/AI.png';
 import featureUsageIcon from './assets/Reducing Churn.png';
-import reportsIcon from './assets/Graph Report.png';
 import settingsIcon from './assets/Settings (1).png';
 import Logo from './assets/Logo.png';
 
 const menuItems = [
-  { name: 'Dashboard', href: '/', image: dashboardIcon },
+  { name: 'Dashboard', href: '/dashboard', image: dashboardIcon },
   { name: 'Pengguna', href: '/pengguna', image: usersIcon },
   { name: 'Kategori', href: '/kategori', icon: FolderTree },
   { name: 'AI Notifikasi', href: '/notifikasi', image: notificationsIcon },

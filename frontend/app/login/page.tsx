@@ -5,8 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
-export default function LoginPage() {
+function LoginFormContent() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
@@ -40,13 +41,25 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(data.user));
 
       // Arahkan ke halaman dashboard
-      router.push('/');
+      router.push('/dashboard');
     } catch (error: any) {
       setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
   };
+
+  // Handler Google Login Pop-up
+  const googleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      console.log('Google login sukses:', tokenResponse);
+      localStorage.setItem('token', tokenResponse.access_token);
+      router.push('/dashboard');
+    },
+    onError: () => {
+      setErrorMessage('Gagal masuk menggunakan Google. Silakan coba lagi.');
+    },
+  });
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
@@ -94,8 +107,8 @@ export default function LoginPage() {
           {/* Google Login Button */}
           <button 
             type="button" 
-            onClick={() => router.push('/')} // Opsi redirect jika login lewat Google
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-indigo-50/60 hover:bg-indigo-50 border border-indigo-100/60 rounded-2xl text-xs font-semibold text-gray-700 transition mb-5"
+            onClick={() => googleLogin()} 
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-indigo-50/60 hover:bg-indigo-50 border border-indigo-100/60 rounded-2xl text-xs font-semibold text-gray-700 transition mb-5 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -156,9 +169,10 @@ export default function LoginPage() {
 
             <div className="flex justify-end">
               <button
-              type="button"
-              onClick={() => router.push('/lupa-sandi' )}
-                className="text-xs font-semibold text-amber-600 hover:underline">
+                type="button"
+                onClick={() => router.push('/lupa-sandi')}
+                className="text-xs font-semibold text-amber-600 hover:underline"
+              >
                 Lupa kata sandi?
               </button>
             </div>
@@ -188,5 +202,13 @@ export default function LoginPage() {
         © 2026 UKu Financial. All rights reserved.
       </footer>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <GoogleOAuthProvider clientId="MASUKKAN_GOOGLE_CLIENT_ID_KAMU_DISINI.apps.googleusercontent.com">
+      <LoginFormContent />
+    </GoogleOAuthProvider>
   );
 }

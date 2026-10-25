@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
+import CategoryForm from '@/components/CategoryForm';
 import Image, { type StaticImageData } from 'next/image';
 import { Plus, FolderTree } from 'lucide-react';
 
@@ -48,6 +49,9 @@ export default function CategoryPage() {
   // State untuk mengontrol Pop-up Modal Hapus
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+  // State untuk mengontrol Pop-up Modal Tambah Kategori
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const fetchCategories = () => {
     fetch(`/api/categories?type=${activeTab}`)
@@ -96,7 +100,10 @@ export default function CategoryPage() {
             <h1 className="text-2xl font-bold text-gray-800">Kategori Keuangan</h1>
             <p className="text-xs text-gray-400 mt-1">Kelola kategori yang tersedia di aplikasi.</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer">
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer"
+          >
             <Plus className="w-4 h-4" />
             <span>Tambah Kategori</span>
           </button>
@@ -172,6 +179,21 @@ export default function CategoryPage() {
           </table>
         </div>
       </main>
+
+      {/* --- POP-UP MODAL TAMBAH KATEGORI --- */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-gray-100 relative">
+            <button
+              onClick={() => setIsAddModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer"
+            >
+              ✕
+            </button>
+            <CategoryForm />
+          </div>
+        </div>
+      )}
 
       {/* --- POP-UP MODAL KONFIRMASI HAPUS --- */}
       {isDeleteModalOpen && (
