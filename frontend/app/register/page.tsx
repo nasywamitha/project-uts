@@ -5,12 +5,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
+import { registerUser } from '@/services/authService'; // 👈 Menggunakan service terpusat
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  // 1. Tambahkan state untuk menampung input form
   const [nama, setNama] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
@@ -18,35 +18,27 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // 2. Perbaiki fungsi handleRegister agar menggunakan state di atas
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nama,       // Mengambil dari state nama
-          email,      // Mengambil dari state email
-          whatsapp,   // Mengambil dari state whatsapp
-          password,   // Mengambil dari state password
-          role: 'User'
-        })
+      // Memanggil fungsi dari authService
+      await registerUser({
+        nama,
+        email,
+        whatsapp,
+        password,
+        role: 'User',
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Registrasi gagal!');
-      }
 
       alert('Registrasi berhasil! Silakan login.');
       router.push('/login');
     } catch (error: any) {
-      setErrorMessage(error.message);
+      setErrorMessage(
+        error.response?.data?.message || error.message || 'Registrasi gagal!'
+      );
     } finally {
       setLoading(false);
     }
@@ -73,7 +65,6 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Pastikan form memanggil handleRegister */}
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
               <label className="block text-[11px] font-bold text-gray-700 mb-1.5">Nama Lengkap *</label>
@@ -136,7 +127,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-2xl shadow-md transition mt-2"
+              className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-2xl shadow-md transition mt-2 cursor-pointer disabled:opacity-50"
             >
               {loading ? 'Memproses...' : 'Daftar Akun'}
             </button>

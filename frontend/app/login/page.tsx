@@ -6,60 +6,67 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import { loginUser } from '@/services/authService'; // 👈 Menggunakan service terpusat
 
 function LoginFormContent() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  // State untuk menangani form dan koneksi backend
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Fungsi handler login terhubung ke backend Express
+  // Fungsi handler login menggunakan authService
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const data = await loginUser({ email, password });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Email atau kata sandi salah!');
-      }
-
-      // Simpan token JWT & data user ke localStorage
+      // Simpan token JWT & data user ke localStorage dengan kunci yang konsisten
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Simpan rincian terpisah agar Header/useAuth langsung mendeteksinya
+      localStorage.setItem('userName', data.user?.name || 'Admin UKu');
+      localStorage.setItem('userEmail', data.user?.email || email);
+      localStorage.setItem('userRole', data.user?.role || 'Admin');
 
       // Arahkan ke halaman dashboard
       router.push('/dashboard');
     } catch (error: any) {
-      setErrorMessage(error.message);
+      setErrorMessage(
+        error.response?.data?.message || error.message || 'Email atau kata sandi salah!'
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Handler Google Login Pop-up
+// Handler Google Login Pop-up
   const googleLogin = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       console.log('Google login sukses:', tokenResponse);
-      localStorage.setItem('token', tokenResponse.access_token);
+      const token = tokenResponse.access_token;
+
+      // 1. Simpan ke localStorage (untuk kebutuhan client-side)
+      localStorage.setItem('token', token);
+      localStorage.setItem('userName', 'Google User');
+      localStorage.setItem('userRole', 'User');
+
+      // 💡 2. Tambahkan ini agar terbaca oleh Server Actions Next.js (Mencegah Akses Ditolak)
+      document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
+
       router.push('/dashboard');
     },
     onError: () => {
       setErrorMessage('Gagal masuk menggunakan Google. Silakan coba lagi.');
     },
   });
+  
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
@@ -81,7 +88,6 @@ function LoginFormContent() {
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-white border border-gray-100 shadow-xl rounded-3xl p-8 sm:p-10">
           
-          {/* Logo di dalam Card */}
           <div className="flex justify-center mb-6">
             <Image 
               src="/logo.png" 
@@ -97,7 +103,6 @@ function LoginFormContent() {
             <p className="text-xs text-gray-400 mt-1">Kelola keuangan bisnis dan personal Anda</p>
           </div>
 
-          {/* Pesan Error jika Login Gagal */}
           {errorMessage && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-2xl text-xs text-center font-medium">
               {errorMessage}
@@ -119,13 +124,11 @@ function LoginFormContent() {
             Login dengan Google
           </button>
 
-          {/* Divider */}
           <div className="relative flex items-center justify-center mb-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100"></div></div>
             <span className="relative bg-white px-3 text-[10px] font-bold text-gray-400 tracking-wider uppercase">ATAU DENGAN EMAIL</span>
           </div>
 
-          {/* Form Input dipasangkan event onSubmit={handleLogin} */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-[11px] font-bold text-gray-700 mb-1.5">Email atau ID Pengguna</label>
@@ -177,7 +180,6 @@ function LoginFormContent() {
               </button>
             </div>
 
-            {/* Tombol Login type submit */}
             <button 
               type="submit" 
               disabled={loading}

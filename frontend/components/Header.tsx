@@ -4,14 +4,27 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell, Check, UserPlus, ShieldAlert, Info, Search, LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth'; // 👈 1. Impor custom hook useAuth yang sudah dibuat
 
 export default function Header() {
   const router = useRouter();
+  const { user } = useAuth(); // 👈 2. Ambil data user yang sedang login
   
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(3);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [loadingLogout, setLoadingLogout] = useState(false);
+
+  // Ambil inisial nama untuk avatar (Contoh: "Admin UKu" menjadi "AU")
+  const getInitials = (name: string) => {
+    if (!name) return 'US';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
 
   const notifications = [
     {
@@ -56,6 +69,9 @@ export default function Header() {
       if (res.ok || res.status === 404) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userRole');
         router.push('/login');
         router.refresh();
       } else {
@@ -163,12 +179,17 @@ export default function Header() {
             }}
             className="flex items-center gap-3 focus:outline-none hover:opacity-80 transition cursor-pointer p-1 rounded-xl"
           >
+            {/* 3. Avatar Dinamis berdasarkan nama user */}
             <div className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs">
-              BP
+              {getInitials(user?.name || 'Budi Pratama')}
             </div>
             <div className="hidden sm:block text-left">
-              <p className="text-xs font-bold text-gray-800 leading-tight">Budi Pratama</p>
-              <p className="text-[10px] text-gray-400">Admin</p>
+              {/* 4. Nama Dinamis */}
+              <p className="text-xs font-bold text-gray-800 leading-tight">
+                {user?.name || 'Budi Pratama'}
+              </p>
+              {/* 5. Role Dinamis */}
+              <p className="text-[10px] text-gray-400">{user?.role || 'Admin'}</p>
             </div>
           </button>
 
@@ -177,8 +198,10 @@ export default function Header() {
             <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl border border-gray-200 shadow-2xl z-50 overflow-hidden">
               {/* Header Info Akun */}
               <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-                <p className="text-xs font-bold text-gray-800">Budi Pratama</p>
-                <p className="text-[11px] text-gray-500 truncate mt-0.5">budi.pratama@uku.co.id</p>
+                <p className="text-xs font-bold text-gray-800">{user?.name || 'Budi Pratama'}</p>
+                <p className="text-[11px] text-gray-500 truncate mt-0.5">
+                  {user?.email || 'admin@uku.id'}
+                </p>
               </div>
 
               {/* Menu Langsung ke Halaman Pengaturan Utama */}

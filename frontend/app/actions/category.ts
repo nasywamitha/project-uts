@@ -1,6 +1,6 @@
 'use server';
 
-import { categorySchema } from '@/components/lib/schemas';
+import { categorySchema } from '@/lib/schemas';
 import { cookies } from 'next/headers';
 
 export type ActionState = {
@@ -17,7 +17,7 @@ export async function createCategoryAction(
   prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  // 1. Cek Autentikasi (Proteksi Server Action)
+  // 1. Cek Autentikasi dari Cookie
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
@@ -28,13 +28,14 @@ export async function createCategoryAction(
     };
   }
 
-  // 2. Ambil data dari FormData
+  // 2. Ambil data dari Form
   const rawData = {
     name: formData.get('name'),
     type: formData.get('type'),
+    icon: formData.get('icon') || 'utensils', // Default icon jika belum dipilih
   };
 
-  // 3. Validasi menggunakan Zod dengan safeParse (Error per Field)
+  // 3. Validasi Zod
   const validatedFields = categorySchema.safeParse(rawData);
 
   if (!validatedFields.success) {
@@ -45,17 +46,36 @@ export async function createCategoryAction(
     };
   }
 
-  // 4. Simpan ke database / backend
+  // 4. Kirim Data ke Backend Express (MySQL)
   try {
+    const response = await fetch('http://localhost:5000/api/categories', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(validatedFields.data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: result.message || 'Gagal menyimpan kategori ke database.',
+      };
+    }
+
     return {
       success: true,
       message: 'Kategori berhasil ditambahkan!',
-      data: validatedFields.data,
+      data: result.data,
     };
   } catch (error) {
+    console.error('Error create category:', error);
     return {
       success: false,
-      message: 'Terjadi kesalahan pada server.',
+      message: 'Terjadi kesalahan koneksi ke server backend.',
     };
   }
 }
