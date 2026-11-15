@@ -1,28 +1,32 @@
-'use client';
-
 import { useState, useEffect } from 'react';
-import { getDashboardStats } from '@/services/dashboardService';
+import { dashboardService } from '@/services/dashboardService';
 
 export function useDashboard() {
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<any>({
+    stats: { totalPengguna: 0, penggunaAktif: 0, penggunaBaru: 0, totalAktivitas: 0 },
+    chart: [],
+    features: [],       // Kosong secara default
+    recentUsers: [],    // Kosong secara default
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const data = await getDashboardStats();
-        setStats(data);
-      } catch (err: any) {
-        setError(err.message || 'Gagal memuat data dashboard');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchData();
+    dashboardService.getDashboardData()
+      .then((res) => {
+        if (res) setData(res);
+      })
+      .catch((err) => {
+        console.error('Error fetching dashboard:', err);
+        // Fallback jika backend belum siap / kosong
+        setData({
+          stats: { totalPengguna: 0, penggunaAktif: 0, penggunaBaru: 0, totalAktivitas: 0 },
+          chart: [],
+          features: [],
+          recentUsers: [],
+        });
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
-  return { stats, loading, error };
+  return { ...data, isLoading };
 }

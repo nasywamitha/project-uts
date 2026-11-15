@@ -1,81 +1,54 @@
 'use server';
 
-import { categorySchema } from '@/lib/schemas';
 import { cookies } from 'next/headers';
 
 export type ActionState = {
   success: boolean;
-  message?: string;
+  message: string;
   errors?: {
     name?: string[];
     type?: string[];
   };
-  data?: any;
 };
 
-export async function createCategoryAction(
-  prevState: ActionState,
-  formData: FormData
-): Promise<ActionState> {
-  // 1. Cek Autentikasi dari Cookie
+export async function createCategoryAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
+  const name = formData.get('name');
+  const type = formData.get('type');
+  const icon = formData.get('icon');
+
+  // 1. Ambil cookie token dari browser pengguna
   const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
+  const token = cookieStore.get('token')?.value; // Sesuaikan nama cookie token Anda jika berbeda (misal: 'access_token', 'session', dll)
 
-  if (!token) {
-    return {
-      success: false,
-      message: 'Akses ditolak. Anda harus login terlebih dahulu.',
-    };
-  }
-
-  // 2. Ambil data dari Form
-  const rawData = {
-    name: formData.get('name'),
-    type: formData.get('type'),
-    icon: formData.get('icon') || 'utensils', // Default icon jika belum dipilih
-  };
-
-  // 3. Validasi Zod
-  const validatedFields = categorySchema.safeParse(rawData);
-
-  if (!validatedFields.success) {
-    return {
-      success: false,
-      message: 'Validasi gagal. Periksa kembali input Anda.',
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
-  }
-
-  // 4. Kirim Data ke Backend Express (MySQL)
   try {
-    const response = await fetch('http://localhost:5000/api/categories', {
+    // 2. Kirim ke backend Express dengan menyertakan Header Authorization
+    const res = await fetch('http://localhost:5000/api/categories', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`, // Sertakan token di sini
       },
-      body: JSON.stringify(validatedFields.data),
+      body: JSON.stringify({ name, type, icon }),
     });
 
-    const result = await response.json();
+    const data = await res.json();
 
-    if (!response.ok) {
+    if (!res.ok) {
       return {
         success: false,
-        message: result.message || 'Gagal menyimpan kategori ke database.',
+        message: data.message || 'Gagal menambahkan kategori.',
       };
     }
 
     return {
       success: true,
       message: 'Kategori berhasil ditambahkan!',
-      data: result.data,
     };
   } catch (error) {
-    console.error('Error create category:', error);
+    console.error('Error server action:', error);
     return {
       success: false,
-      message: 'Terjadi kesalahan koneksi ke server backend.',
+      message: 'Terjadi kesalahan pada koneksi server.',
     };
   }
 }

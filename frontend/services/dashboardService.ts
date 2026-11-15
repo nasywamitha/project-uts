@@ -1,11 +1,9 @@
-import { api } from '@/lib/axios';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-export const getDashboardStats = async () => {
-  const response = await api.get('/dashboard/stats');
-  return response.data;
-};
-
-export const getRecentUsers = async () => {
-  const response = await api.get('/dashboard/recent-users');
-  return response.data;
+export const dashboardService = {
+  getDashboardData: async () => {
+    const res = await fetch(`${API_URL}/dashboard`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Gagal mengambil data dashboard');
+    return res.json();
+  },
 };

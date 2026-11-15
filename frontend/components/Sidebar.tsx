@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { FolderTree } from 'lucide-react';
 import dashboardIcon from './assets/Windows 11.png';
 import usersIcon from './assets/User.png';
-import notificationsIcon from './assets/AI.png';
 import featureUsageIcon from './assets/Reducing Churn.png';
 import settingsIcon from './assets/Settings (1).png';
 import Logo from './assets/Logo.png';
@@ -15,7 +14,6 @@ const menuItems = [
   { name: 'Dashboard', href: '/dashboard', image: dashboardIcon },
   { name: 'Pengguna', href: '/pengguna', image: usersIcon },
   { name: 'Kategori', href: '/kategori', icon: FolderTree },
-  { name: 'AI Notifikasi', href: '/notifikasi', image: notificationsIcon },
   { name: 'Penggunaan Fitur', href: '/fitur', image: featureUsageIcon },
   { name: 'Pengaturan', href: '/pengaturan', image: settingsIcon },
 ];

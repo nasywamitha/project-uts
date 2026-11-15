@@ -4,36 +4,10 @@ import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import CategoryForm from '@/components/CategoryForm';
-import Image, { type StaticImageData } from 'next/image';
+import DeleteCategoryModal from '@/components/DeleteCategoryModal';
+import { iconMap } from '@/lib/iconMap';
+import Image from 'next/image';
 import { Plus, FolderTree } from 'lucide-react';
-
-import airplaneImage from '@/components/assets/Airplane Landing.png';
-import beautyImage from '@/components/assets/Beautician.png';
-import charityImage from '@/components/assets/Charity.png';
-import clothesImage from '@/components/assets/Clothes.png';
-import glassesImage from '@/components/assets/3D Glasses.png';
-import hospitalImage from '@/components/assets/Hospital Room.png';
-import houseImage from '@/components/assets/House.png';
-import petsImage from '@/components/assets/Pet Commands Summon.png';
-import educationImage from '@/components/assets/Online Group Studying.png';
-import transportationImage from '@/components/assets/Public Transportation.png';
-import restaurantImage from '@/components/assets/Restaurant.png';
-import shoppingImage from '@/components/assets/Shopping Bag.png';
-
-const iconMap: Record<string, StaticImageData> = {
-  utensils: restaurantImage,
-  car: transportationImage,
-  'shopping-bag': shoppingImage,
-  'graduation-cap': educationImage,
-  shirt: clothesImage,
-  heart: charityImage,
-  glasses: glassesImage,
-  home: houseImage,
-  sparkles: beautyImage,
-  'paw-print': petsImage,
-  plane: airplaneImage,
-  bed: hospitalImage,
-};
 
 type Category = {
   id: string;
@@ -46,11 +20,11 @@ export default function CategoryPage() {
   const [activeTab, setActiveTab] = useState<'Pengeluaran' | 'Pemasukan'>('Pengeluaran');
   const [categories, setCategories] = useState<Category[]>([]);
 
-  // State untuk mengontrol Pop-up Modal Hapus
+  // State untuk Modal Hapus
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
-  // State untuk mengontrol Pop-up Modal Tambah Kategori
+  // State untuk Modal Tambah Kategori
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const fetchCategories = () => {
@@ -62,11 +36,6 @@ export default function CategoryPage() {
   useEffect(() => {
     fetchCategories();
   }, [activeTab]);
-
-  const openDeleteModal = (category: Category) => {
-    setSelectedCategory(category);
-    setIsDeleteModalOpen(true);
-  };
 
   const confirmDelete = async () => {
     if (!selectedCategory) return;
@@ -146,13 +115,7 @@ export default function CategoryPage() {
                     <td className="p-4 text-center">
                       <div className="w-9 h-9 bg-amber-100/70 text-amber-600 rounded-xl inline-flex items-center justify-center">
                         {categoryImage ? (
-                          <Image
-                            src={categoryImage}
-                            alt={`Ikon ${item.name}`}
-                            width={24}
-                            height={24}
-                            className="w-6 h-6 object-contain"
-                          />
+                          <Image src={categoryImage} alt={`Ikon ${item.name}`} width={24} height={24} className="w-6 h-6 object-contain" />
                         ) : (
                           <FolderTree className="w-4 h-4" />
                         )}
@@ -166,7 +129,7 @@ export default function CategoryPage() {
                     <td className="p-4 text-right pr-6 space-x-3">
                       <button className="text-xs font-semibold text-gray-500 hover:text-amber-600 cursor-pointer">Edit</button>
                       <button 
-                        onClick={() => openDeleteModal(item)}
+                        onClick={() => { setSelectedCategory(item); setIsDeleteModalOpen(true); }} 
                         className="text-xs font-semibold text-red-500 hover:text-red-700 cursor-pointer"
                       >
                         Hapus
@@ -181,50 +144,32 @@ export default function CategoryPage() {
       </main>
 
       {/* --- POP-UP MODAL TAMBAH KATEGORI --- */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-gray-100 relative">
-            <button
-              onClick={() => setIsAddModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer"
-            >
-              ✕
-            </button>
-            <CategoryForm />
-          </div>
-        </div>
-      )}
+{isAddModalOpen && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-gray-100 relative">
+      <button 
+        onClick={() => setIsAddModalOpen(false)} 
+        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer"
+      >
+        ✕
+      </button>
+      <CategoryForm 
+        onSuccess={() => {
+          setIsAddModalOpen(false);
+          fetchCategories(); // <-- Pastikan fungsi ini ada untuk mengambil data terbaru dari database!
+        }} 
+      />
+    </div>
+  </div>
+)}
 
       {/* --- POP-UP MODAL KONFIRMASI HAPUS --- */}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl border border-gray-100 text-center space-y-4">
-            <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto font-bold text-lg">
-              !
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-800 text-base">Hapus Kategori</h3>
-              <p className="text-xs text-gray-500 mt-1">
-                Apakah Anda yakin ingin menghapus kategori <span className="font-semibold text-gray-700">"{selectedCategory?.name}"</span> ini?
-              </p>
-            </div>
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-md shadow-red-500/20"
-              >
-                Hapus
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteCategoryModal 
+        isOpen={isDeleteModalOpen}
+        category={selectedCategory}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

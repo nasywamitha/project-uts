@@ -1,9 +1,20 @@
 import { api } from '@/lib/axios';
 
-// Fungsi untuk menambah kategori baru
+// Contoh fungsi untuk menambah kategori baru ke backend Express
 export const createCategory = async (categoryData: { name: string; type: string; icon: string }) => {
-  const response = await api.post('/categories', categoryData);
-  return response.data;
+  const response = await fetch('http://localhost:5000/api/categories', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(categoryData),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Gagal menambahkan kategori');
+  }
+  return data;
 };
 
 // Mengambil kategori berdasarkan tipe (Pengeluaran / Pemasukan)
