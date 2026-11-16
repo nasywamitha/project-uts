@@ -1,8 +1,9 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react'; // [TAMBAH] useState
 import { createCategoryAction, ActionState } from '../app/actions/category';
 import { ChevronDown } from 'lucide-react';
+import IconPicker from '@/components/IconPicker'; // [TAMBAH] import IconPicker
 
 const initialState: ActionState = {
   success: false,
@@ -15,8 +16,8 @@ interface CategoryFormProps {
 
 export default function CategoryForm({ onSuccess }: CategoryFormProps) {
   const [state, formAction, isPending] = useActionState(createCategoryAction, initialState);
+  const [selectedIcon, setSelectedIcon] = useState('utensils'); // [TAMBAH] state ikon terpilih
 
-  // Jika berhasil disimpan, panggil onSuccess untuk menutup modal & refresh data di page.tsx
   useEffect(() => {
     if (state.success && onSuccess) {
       onSuccess();
@@ -30,14 +31,13 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
         <p className="text-xs text-gray-400 mt-0.5">Masukkan nama, tipe, dan ikon kategori keuangan.</p>
       </div>
 
-      {/* Pesan Sukses / Error Umum */}
       {state.message && (
         <div className={`p-3 text-xs rounded-xl font-medium ${state.success ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
           {state.message}
         </div>
       )}
 
-      {/* Input Nama Kategori */}
+      {/* Input Nama Kategori (TETAP) */}
       <div className="space-y-1.5">
         <label className="block text-xs font-bold text-gray-700">Nama Kategori</label>
         <input
@@ -52,7 +52,7 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
         )}
       </div>
 
-      {/* Pilihan Tipe Kategori */}
+      {/* Pilihan Tipe Kategori (TETAP) */}
       <div className="space-y-1.5">
         <label className="block text-xs font-bold text-gray-700">Tipe Kategori</label>
         <div className="relative">
@@ -75,35 +75,14 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
         )}
       </div>
 
-      {/* Pilihan Ikon (Diperlukan agar sesuai iconMap di database/frontend) */}
+      {/* [GANTI] Bagian <select name="icon"> lama diganti menjadi ini: */}
       <div className="space-y-1.5">
         <label className="block text-xs font-bold text-gray-700">Ikon Kategori</label>
-        <div className="relative">
-          <select
-            name="icon"
-            defaultValue="utensils"
-            className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 pr-10 text-xs text-gray-800 shadow-xs focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white appearance-none cursor-pointer"
-          >
-            <option value="utensils">Makanan / Restoran (utensils)</option>
-            <option value="car">Transportasi (car)</option>
-            <option value="shopping-bag">Belanja (shopping-bag)</option>
-            <option value="graduation-cap">Pendidikan (graduation-cap)</option>
-            <option value="shirt">Pakaian (shirt)</option>
-            <option value="heart">Charity / Kebajikan (heart)</option>
-            <option value="glasses">Hiburan / Bioskop (glasses)</option>
-            <option value="home">Rumah (home)</option>
-            <option value="sparkles">Kecantikan (sparkles)</option>
-            <option value="paw-print">Hewan Peliharaan (paw-print)</option>
-            <option value="plane">Travel / Penerbangan (plane)</option>
-            <option value="bed">Kesehatan / Rumah Sakit (bed)</option>
-          </select>
-          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
-            <ChevronDown className="w-4 h-4" />
-          </div>
-        </div>
+        <input type="hidden" name="icon" value={selectedIcon} />
+        <IconPicker value={selectedIcon} onChange={setSelectedIcon} />
       </div>
 
-      {/* Tombol Submit */}
+      {/* Tombol Submit (TETAP) */}
       <button
         type="submit"
         disabled={isPending}

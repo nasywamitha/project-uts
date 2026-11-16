@@ -1,30 +1,161 @@
-// frontend/lib/iconMap.ts
-import { type StaticImageData } from 'next/image';
+import React from 'react';
+import {
+  Utensils,
+  Coffee,
+  Pizza,
+  Car,
+  Bus,
+  Fuel,
+  Plane,
+  ShoppingBag,
+  ShoppingCart,
+  GraduationCap,
+  BookOpen,
+  Shirt,
+  Heart,
+  HeartHandshake,
+  Glasses,
+  Film,
+  Gamepad2,
+  Music,
+  Home,
+  Building2,
+  Zap,
+  Droplets,
+  Wifi,
+  Smartphone,
+  Sparkles,
+  Scissors,
+  PawPrint,
+  Bed,
+  Stethoscope,
+  Pill,
+  Dumbbell,
+  Baby,
+  Wallet,
+  Banknote,
+  Coins,
+  PiggyBank,
+  CreditCard,
+  Landmark,
+  Receipt,
+  Briefcase,
+  TrendingUp,
+  Gift,
+  Wrench,
+  Package,
+  LucideIcon,
+} from 'lucide-react';
 
-import airplaneImage from '@/components/assets/Airplane Landing.png';
-import beautyImage from '@/components/assets/Beautician.png';
-import charityImage from '@/components/assets/Charity.png';
-import clothesImage from '@/components/assets/Clothes.png';
-import glassesImage from '@/components/assets/3D Glasses.png';
-import hospitalImage from '@/components/assets/Hospital Room.png';
-import houseImage from '@/components/assets/House.png';
-import petsImage from '@/components/assets/Pet Commands Summon.png';
-import educationImage from '@/components/assets/Online Group Studying.png';
-import transportationImage from '@/components/assets/Public Transportation.png';
-import restaurantImage from '@/components/assets/Restaurant.png';
-import shoppingImage from '@/components/assets/Shopping Bag.png';
+// Tetap mempertahankan 12 key lama + tambahan ikon baru
+export const iconMap: Record<string, LucideIcon> = {
+  // Key lama (kompatibel dengan database yang sudah ada)
+  utensils: Utensils,
+  car: Car,
+  'shopping-bag': ShoppingBag,
+  'graduation-cap': GraduationCap,
+  shirt: Shirt,
+  heart: Heart,
+  glasses: Glasses,
+  home: Home,
+  sparkles: Sparkles,
+  'paw-print': PawPrint,
+  plane: Plane,
+  bed: Bed,
 
-export const iconMap: Record<string, StaticImageData> = {
-  utensils: restaurantImage,
-  car: transportationImage,
-  'shopping-bag': shoppingImage,
-  'graduation-cap': educationImage,
-  shirt: clothesImage,
-  heart: charityImage,
-  glasses: glassesImage,
-  home: houseImage,
-  sparkles: beautyImage,
-  'paw-print': petsImage,
-  plane: airplaneImage,
-  bed: hospitalImage,
+  // Tambahan ikon Pemasukan & Keuangan
+  wallet: Wallet,
+  banknote: Banknote,
+  coins: Coins,
+  'piggy-bank': PiggyBank,
+  'credit-card': CreditCard,
+  landmark: Landmark,
+  briefcase: Briefcase,
+  'trending-up': TrendingUp,
+  gift: Gift,
+  receipt: Receipt,
+
+  // Tambahan ikon Pengeluaran & Harian
+  coffee: Coffee,
+  pizza: Pizza,
+  'shopping-cart': ShoppingCart,
+  bus: Bus,
+  fuel: Fuel,
+  'book-open': BookOpen,
+  'heart-handshake': HeartHandshake,
+  film: Film,
+  gamepad: Gamepad2,
+  music: Music,
+  building: Building2,
+  zap: Zap,
+  droplets: Droplets,
+  wifi: Wifi,
+  smartphone: Smartphone,
+  scissors: Scissors,
+  stethoscope: Stethoscope,
+  pill: Pill,
+  dumbbell: Dumbbell,
+  baby: Baby,
+  wrench: Wrench,
+  package: Package,
 };
+
+// Kata kunci untuk fitur pencarian di IconPicker
+export const iconKeywords: Record<string, string> = {
+  utensils: 'makanan restoran makan dapur',
+  coffee: 'kopi kafe minuman nongkrong',
+  pizza: 'jajan cemilan fast food',
+  car: 'mobil transportasi kendaraan',
+  bus: 'bus umum transport perjalanan',
+  fuel: 'bensin spbu bahan bakar',
+  plane: 'pesawat travel liburan penerbangan',
+  'shopping-bag': 'belanja tas mall',
+  'shopping-cart': 'groceries supermarket belanja bulanan',
+  'graduation-cap': 'pendidikan kuliah sekolah wisuda',
+  'book-open': 'buku kursus belajar',
+  shirt: 'pakaian baju fashion kaos',
+  heart: 'sosial amal charity donasi',
+  'heart-handshake': 'bantuan zakat infaq sedekah',
+  glasses: 'hiburan nonton bioskop',
+  film: 'film streaming netflix bioskop',
+  gamepad: 'game hobi mainan',
+  music: 'musik konser spotify',
+  home: 'rumah tempat tinggal keluarga',
+  building: 'sewa kos kontrakan apartemen',
+  zap: 'listrik tagihan pln token',
+  droplets: 'air pdam tagihan',
+  wifi: 'internet wifi indihome',
+  smartphone: 'pulsa hp paket data',
+  sparkles: 'kecantikan skincare kosmetik',
+  scissors: 'salon potong rambut perawatan',
+  'paw-print': 'hewan peliharaan kucing anjing',
+  bed: 'kesehatan rumah sakit rawat inap',
+  stethoscope: 'dokter klinik periksa medis',
+  pill: 'obat apotek vitamin',
+  dumbbell: 'olahraga gym fitness',
+  baby: 'anak bayi perlengkapan',
+  wallet: 'dompet gaji utama saldo',
+  banknote: 'uang tunai gaji upah',
+  coins: 'receh uang tambahan',
+  'piggy-bank': 'tabungan celengan simpanan',
+  'credit-card': 'kartu kredit cicilan',
+  landmark: 'bank transfer pajak administrasi',
+  briefcase: 'bisnis kerja proyek freelance',
+  'trending-up': 'investasi saham reksadana profit',
+  gift: 'hadiah bonus thr kado',
+  receipt: 'struk nota tagihan',
+  wrench: 'servis perbaikan bengkel',
+  package: 'paket ongkir belanja online',
+};
+
+// Helper component untuk menampilkan ikon di tabel maupun modal
+export function CategoryIcon({
+  name,
+  className = 'w-5 h-5',
+}: {
+  name: string;
+  className?: string;
+}) {
+  const IconComponent = iconMap[name] || Wallet;
+  return React.createElement(IconComponent, { className });
+}

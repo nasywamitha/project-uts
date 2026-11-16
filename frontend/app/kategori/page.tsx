@@ -6,7 +6,6 @@ import Header from '@/components/Header';
 import CategoryForm from '@/components/CategoryForm';
 import DeleteCategoryModal from '@/components/DeleteCategoryModal';
 import { iconMap } from '@/lib/iconMap';
-import Image from 'next/image';
 import { Plus, FolderTree } from 'lucide-react';
 
 type Category = {
@@ -19,12 +18,8 @@ type Category = {
 export default function CategoryPage() {
   const [activeTab, setActiveTab] = useState<'Pengeluaran' | 'Pemasukan'>('Pengeluaran');
   const [categories, setCategories] = useState<Category[]>([]);
-
-  // State untuk Modal Hapus
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-
-  // State untuk Modal Tambah Kategori
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const fetchCategories = () => {
@@ -39,16 +34,12 @@ export default function CategoryPage() {
 
   const confirmDelete = async () => {
     if (!selectedCategory) return;
-
     try {
-      const res = await fetch(`/api/categories/${selectedCategory.id}`, {
-        method: 'DELETE',
-      });
-
+      const res = await fetch(`/api/categories/${selectedCategory.id}`, { method: 'DELETE' });
       if (res.ok) {
         setIsDeleteModalOpen(false);
         setSelectedCategory(null);
-        fetchCategories(); 
+        fetchCategories();
       } else {
         alert('Gagal menghapus kategori.');
       }
@@ -69,7 +60,7 @@ export default function CategoryPage() {
             <h1 className="text-2xl font-bold text-gray-800">Kategori Keuangan</h1>
             <p className="text-xs text-gray-400 mt-1">Kelola kategori yang tersedia di aplikasi.</p>
           </div>
-          <button 
+          <button
             onClick={() => setIsAddModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer"
           >
@@ -108,30 +99,21 @@ export default function CategoryPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {categories.map((item) => {
-                const categoryImage = iconMap[item.icon];
+                const IconComponent = iconMap[item.icon];
                 return (
                   <tr key={item.id} className="hover:bg-gray-50/60">
                     <td className="p-4 pl-6 font-bold text-gray-800">{item.name}</td>
                     <td className="p-4 text-center">
                       <div className="w-9 h-9 bg-amber-100/70 text-amber-600 rounded-xl inline-flex items-center justify-center">
-                        {categoryImage ? (
-                          <Image src={categoryImage} alt={`Ikon ${item.name}`} width={24} height={24} className="w-6 h-6 object-contain" />
-                        ) : (
-                          <FolderTree className="w-4 h-4" />
-                        )}
+                        {IconComponent ? <IconComponent className="w-5 h-5" /> : <FolderTree className="w-4 h-4" />}
                       </div>
                     </td>
                     <td className="p-4 text-center">
-                      <span className="bg-indigo-50 text-indigo-500 px-3 py-1 rounded-full text-xs font-medium inline-block">
-                        {item.type}
-                      </span>
+                      <span className="bg-indigo-50 text-indigo-500 px-3 py-1 rounded-full text-xs font-medium inline-block">{item.type}</span>
                     </td>
                     <td className="p-4 text-right pr-6 space-x-3">
                       <button className="text-xs font-semibold text-gray-500 hover:text-amber-600 cursor-pointer">Edit</button>
-                      <button 
-                        onClick={() => { setSelectedCategory(item); setIsDeleteModalOpen(true); }} 
-                        className="text-xs font-semibold text-red-500 hover:text-red-700 cursor-pointer"
-                      >
+                      <button onClick={() => { setSelectedCategory(item); setIsDeleteModalOpen(true); }} className="text-xs font-semibold text-red-500 hover:text-red-700 cursor-pointer">
                         Hapus
                       </button>
                     </td>
@@ -143,28 +125,18 @@ export default function CategoryPage() {
         </div>
       </main>
 
-      {/* --- POP-UP MODAL TAMBAH KATEGORI --- */}
-{isAddModalOpen && (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-gray-100 relative">
-      <button 
-        onClick={() => setIsAddModalOpen(false)} 
-        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer"
-      >
-        ✕
-      </button>
-      <CategoryForm 
-        onSuccess={() => {
-          setIsAddModalOpen(false);
-          fetchCategories(); // <-- Pastikan fungsi ini ada untuk mengambil data terbaru dari database!
-        }} 
-      />
-    </div>
-  </div>
-)}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl border border-gray-100 relative">
+            <button onClick={() => setIsAddModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer">
+              ✕
+            </button>
+            <CategoryForm onSuccess={() => { setIsAddModalOpen(false); fetchCategories(); }} />
+          </div>
+        </div>
+      )}
 
-      {/* --- POP-UP MODAL KONFIRMASI HAPUS --- */}
-      <DeleteCategoryModal 
+      <DeleteCategoryModal
         isOpen={isDeleteModalOpen}
         category={selectedCategory}
         onClose={() => setIsDeleteModalOpen(false)}
