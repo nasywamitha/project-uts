@@ -1,9 +1,9 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react'; // [TAMBAH] useState
-import { createCategoryAction, ActionState } from '../app/actions/category';
+import { useActionState, useEffect, useState } from 'react';
+import { createCategoryAction, ActionState } from '@/app/actions/category';
 import { ChevronDown } from 'lucide-react';
-import IconPicker from '@/components/IconPicker'; // [TAMBAH] import IconPicker
+import IconPicker from './IconPicker';
 
 const initialState: ActionState = {
   success: false,
@@ -16,7 +16,7 @@ interface CategoryFormProps {
 
 export default function CategoryForm({ onSuccess }: CategoryFormProps) {
   const [state, formAction, isPending] = useActionState(createCategoryAction, initialState);
-  const [selectedIcon, setSelectedIcon] = useState('utensils'); // [TAMBAH] state ikon terpilih
+  const [selectedIcon, setSelectedIcon] = useState('utensils');
 
   useEffect(() => {
     if (state.success && onSuccess) {
@@ -37,7 +37,7 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
         </div>
       )}
 
-      {/* Input Nama Kategori (TETAP) */}
+      {/* Input Nama Kategori */}
       <div className="space-y-1.5">
         <label className="block text-xs font-bold text-gray-700">Nama Kategori</label>
         <input
@@ -52,7 +52,7 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
         )}
       </div>
 
-      {/* Pilihan Tipe Kategori (TETAP) */}
+      {/* Pilihan Tipe Kategori */}
       <div className="space-y-1.5">
         <label className="block text-xs font-bold text-gray-700">Tipe Kategori</label>
         <div className="relative">
@@ -75,14 +75,14 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
         )}
       </div>
 
-      {/* [GANTI] Bagian <select name="icon"> lama diganti menjadi ini: */}
+      {/* Pilihan Ikon Kategori */}
       <div className="space-y-1.5">
         <label className="block text-xs font-bold text-gray-700">Ikon Kategori</label>
         <input type="hidden" name="icon" value={selectedIcon} />
         <IconPicker value={selectedIcon} onChange={setSelectedIcon} />
       </div>
 
-      {/* Tombol Submit (TETAP) */}
+      {/* Tombol Submit */}
       <button
         type="submit"
         disabled={isPending}

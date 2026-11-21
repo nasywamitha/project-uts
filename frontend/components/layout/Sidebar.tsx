@@ -4,11 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FolderTree } from 'lucide-react';
-import dashboardIcon from './assets/Windows 11.png';
-import usersIcon from './assets/User.png';
-import featureUsageIcon from './assets/Reducing Churn.png';
-import settingsIcon from './assets/Settings (1).png';
-import Logo from './assets/Logo.png';
+import dashboardIcon from '../assets/Windows 11.png';
+import usersIcon from '../assets/User.png';
+import featureUsageIcon from '../assets/Reducing Churn.png';
+import settingsIcon from '../assets/Settings (1).png';
+import Logo from '../assets/Logo.png';
 
 const menuItems = [
   { name: 'Dashboard', href: '/dashboard', image: dashboardIcon },

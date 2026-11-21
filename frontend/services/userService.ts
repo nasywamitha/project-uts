@@ -1,6 +1,6 @@
 import { UsersResponse } from '@/types/user';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export const userService = {
   getAllUsers: async (): Promise<UsersResponse> => {
