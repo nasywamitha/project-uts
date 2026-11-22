@@ -62,26 +62,25 @@ export default function Header() {
   const handleLogout = async () => {
     setLoadingLogout(true);
     try {
-      const res = await fetch('/api/auth/logout', {
+      // Opsional: panggil endpoint logout BE jika sudah ada
+      await fetch('/api/auth/logout', {
         method: 'POST',
       });
-
-      if (res.ok || res.status === 404) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('userRole');
-        router.push('/login');
-        router.refresh();
-      } else {
-        alert('Gagal melakukan logout, silakan coba lagi.');
-      }
     } catch (error) {
       console.error('Logout error:', error);
-      router.push('/login');
     } finally {
-      setLoadingLogout(false);
+      // 1. Bersihkan semua data sesi di localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userRole');
+
+      // 2. Hapus cookie token (harus sama path & SameSite-nya dengan saat login)
+      document.cookie = 'token=; path=/; max-age=0; SameSite=Lax';
+
+      // 3. Arahkan ke halaman /login
+      window.location.href = '/login';
     }
   };
 

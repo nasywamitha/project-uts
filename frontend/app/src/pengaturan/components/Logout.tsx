@@ -26,11 +26,19 @@ export default function SessionLogoutTab({ sessions, setSessions }: { sessions: 
 
     try {
       await settingsService.logoutAll();
-      localStorage.removeItem('token'); // Hapus token auth jika ada
-      window.location.href = '/login';   // Lempar kembali ke halaman login
     } catch (error) {
       console.error(error);
-      alert('Gagal melakukan logout.');
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userRole');
+
+      // Hapus cookie token agar middleware langsung mengarahkan ke /login
+      document.cookie = 'token=; path=/; max-age=0; SameSite=Lax';
+
+      window.location.href = '/login';
     }
   };
 
