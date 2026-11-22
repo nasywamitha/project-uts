@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
-import Header from '@/components/Header';
 import { featureService } from '@/services/featureService';
 
 // Import Komponen Terpisah yang ada di folder components/
@@ -22,20 +20,15 @@ export default function FeatureUsagePage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-white text-gray-800">
-      <Sidebar />
-      <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8 bg-white">
-        <Header />
+    <>
+      {/* Header Halaman */}
+      <UsageHeader />
 
-        {/* Header Halaman */}
-        <UsageHeader />
+      {/* Grafik Statistik (Bar & Pie Chart) */}
+      <UsageCharts data={data} />
 
-        {/* Grafik Statistik (Bar & Pie Chart) */}
-        <UsageCharts data={data} />
-
-        {/* Tabel Rincian Pertumbuhan Fitur */}
-        <UsageTable details={data?.details} />
-      </main>
-    </div>
+      {/* Tabel Rincian Pertumbuhan Fitur */}
+      <UsageTable details={data?.details} />
+    </>
   );
 }

@@ -1,5 +1,5 @@
 // src/services/settingsService.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'; // Sesuaikan port backend Anda
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api'; // Sesuaikan port backend Anda
 
 export const settingsService = {
   getProfile: async () => {

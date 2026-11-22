@@ -2,7 +2,7 @@ import { api } from '@/lib/axios';
 
 // Contoh fungsi untuk menambah kategori baru ke backend Express
 export const createCategory = async (categoryData: { name: string; type: string; icon: string }) => {
-  const response = await fetch('http://localhost:5000/api/categories', {
+  const response = await fetch('/api/categories', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
