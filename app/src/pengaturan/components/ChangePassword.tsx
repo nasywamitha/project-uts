@@ -1,8 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Eye, EyeOff, CheckCircle } from 'lucide-react';
-import { settingsService } from '@/services/settingService'; // <-- Sudah diperbaiki menjadi settingsService (pakai 's')
+import { settingsService } from '@/services/settingsService';
+
+type PasswordHistoryItem = {
+  id: string;
+  timestamp: string;
+  status: 'Berhasil';
+};
+
+const STORAGE_KEY = 'uku_password_update_history';
+
+const formatNowWIB = () => {
+  const now = new Date();
+  const tanggal = now.toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Jakarta',
+  });
+  const jam = now
+    .toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Jakarta',
+    })
+    .replace(':', '.');
+
+  return `${tanggal} • ${jam} WIB`;
+};
 
 export default function ChangePasswordTab() {
   const [showCurrent, setShowCurrent] = useState(false);
@@ -15,7 +43,19 @@ export default function ChangePasswordTab() {
     confirmPassword: '',
   });
 
+  const [history, setHistory] = useState<PasswordHistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setHistory(JSON.parse(saved));
+      }
+    } catch (err) {
+      console.error('Gagal memuat riwayat pembaruan password:', err);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,11 +75,32 @@ export default function ChangePasswordTab() {
       return;
     }
 
+    if (!/(?=.*[a-z])(?=.*[A-Z])/.test(formData.newPassword)) {
+      alert('Password baru harus mengandung huruf besar dan huruf kecil!');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await settingsService.updatePassword({
-        currentPassword: formData.currentPassword,
+        oldPassword: formData.currentPassword,
         newPassword: formData.newPassword,
+      });
+
+      const newEntry: PasswordHistoryItem = {
+        id: String(Date.now()),
+        timestamp: formatNowWIB(),
+        status: 'Berhasil',
+      };
+
+      setHistory((prev) => {
+        const updated = [newEntry, ...prev].slice(0, 10);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        } catch (err) {
+          console.error('Gagal menyimpan riwayat pembaruan password:', err);
+        }
+        return updated;
       });
 
       alert('Password berhasil diperbarui!');
@@ -57,23 +118,22 @@ export default function ChangePasswordTab() {
       <div className="lg:col-span-8 bg-white border border-gray-200 rounded-2xl p-6">
         <h3 className="font-bold text-gray-800 text-sm mb-4">Ubah Password</h3>
         <div className="space-y-3 text-xs">
-          
           {/* Password Saat Ini */}
           <div>
             <label className="block font-bold text-gray-700 mb-1">Password Saat Ini</label>
             <div className="relative">
-              <input 
-                type={showCurrent ? 'text' : 'password'} 
+              <input
+                type={showCurrent ? 'text' : 'password'}
                 name="currentPassword"
                 value={formData.currentPassword}
                 onChange={handleChange}
                 placeholder="Masukkan password saat ini"
                 required
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono focus:outline-none focus:border-amber-500" 
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono focus:outline-none focus:border-amber-500"
               />
-              <button 
-                type="button" 
-                onClick={() => setShowCurrent(!showCurrent)} 
+              <button
+                type="button"
+                onClick={() => setShowCurrent(!showCurrent)}
                 className="absolute right-3 top-3 text-gray-400 cursor-pointer"
               >
                 {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -85,18 +145,18 @@ export default function ChangePasswordTab() {
           <div>
             <label className="block font-bold text-gray-700 mb-1">Password Baru</label>
             <div className="relative">
-              <input 
-                type={showNew ? 'text' : 'password'} 
+              <input
+                type={showNew ? 'text' : 'password'}
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleChange}
                 placeholder="Masukkan password baru"
                 required
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono focus:outline-none focus:border-amber-500" 
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono focus:outline-none focus:border-amber-500"
               />
-              <button 
-                type="button" 
-                onClick={() => setShowNew(!showNew)} 
+              <button
+                type="button"
+                onClick={() => setShowNew(!showNew)}
                 className="absolute right-3 top-3 text-gray-400 cursor-pointer"
               >
                 {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -118,18 +178,18 @@ export default function ChangePasswordTab() {
           <div>
             <label className="block font-bold text-gray-700 mb-1">Konfirmasi Password Baru</label>
             <div className="relative">
-              <input 
-                type={showConfirm ? 'text' : 'password'} 
+              <input
+                type={showConfirm ? 'text' : 'password'}
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="Ulangi password baru"
                 required
-                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono focus:outline-none focus:border-amber-500" 
+                className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-mono focus:outline-none focus:border-amber-500"
               />
-              <button 
-                type="button" 
-                onClick={() => setShowConfirm(!showConfirm)} 
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
                 className="absolute right-3 top-3 text-gray-400 cursor-pointer"
               >
                 {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -137,8 +197,8 @@ export default function ChangePasswordTab() {
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isLoading}
             className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl mt-2 transition cursor-pointer disabled:opacity-50"
           >
@@ -147,14 +207,22 @@ export default function ChangePasswordTab() {
         </div>
       </div>
 
-      {/* Riwayat Pembaruan */}
+      {/* Riwayat Pembaruan Realtime */}
       <div className="lg:col-span-4 bg-white border border-gray-200 rounded-2xl p-6">
         <h3 className="font-bold text-gray-800 text-sm mb-4">Riwayat Pembaruan</h3>
-        <div className="p-3 bg-gray-50 rounded-xl border text-xs">
-          <p className="font-bold text-gray-800">14 Mei 2024 • 08:30 WIB</p>
-          <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-semibold mt-1 inline-block">
-            Berhasil
-          </span>
+        <div className="space-y-2.5">
+          {history.length === 0 ? (
+            <p className="text-xs text-gray-400">Belum ada riwayat pembaruan password.</p>
+          ) : (
+            history.map((item) => (
+              <div key={item.id} className="p-3 bg-gray-50 rounded-xl border text-xs">
+                <p className="font-bold text-gray-800">{item.timestamp}</p>
+                <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-semibold mt-1 inline-block">
+                  {item.status}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </form>

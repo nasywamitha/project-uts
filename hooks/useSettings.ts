@@ -1,7 +1,7 @@
  // frontend/hooks/useSettings.ts
 import { useState, useEffect } from 'react';
 // Sesuaikan path import dengan lokasi file service dan types di proyek Anda
-import { settingsService } from '../services/settingService';
+import { settingsService } from '../services/settingsService';
 import { AdminProfile, UpdateProfilePayload } from '@/types/settings.types';
 
 export function useSettings() {

@@ -4,6 +4,8 @@ export type User = {
   name?: string;
   nama?: string;
   email: string;
+  whatsapp?: string;
+  role?: string;
   status: 'Aktif' | 'Nonaktif';
   registerDate?: string;
   created_at?: string;
@@ -22,7 +24,6 @@ export type UserStats = {
   thisMonth?: number | string;
 };
 
-// Pastikan baris ini ada agar import { UsersResponse } tidak error
 export type UsersResponse = {
   success: boolean;
   stats: UserStats;

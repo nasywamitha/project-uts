@@ -22,7 +22,7 @@ export async function createCategoryAction(prevState: ActionState, formData: For
 
   try {
     // 2. Kirim ke backend Express dengan menyertakan Header Authorization
-    const res = await fetch('http://localhost:5000/api/categories', {
+    const res = await fetch('http://localhost:5001/api/categories', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

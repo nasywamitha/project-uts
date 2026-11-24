@@ -1,25 +1,61 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Bell, Check, UserPlus, ShieldAlert, Info, Search, LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth'; // 👈 1. Impor custom hook useAuth yang sudah dibuat
+import { useAuth } from '@/hooks/useAuth';
+import { settingsService } from '@/services/settingsService';
 
 export default function Header() {
-  const router = useRouter();
-  const { user } = useAuth(); // 👈 2. Ambil data user yang sedang login
-  
+  const { user } = useAuth() as { user: any };
+
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(3);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [loadingLogout, setLoadingLogout] = useState(false);
+  const [profileFallback, setProfileFallback] = useState<{
+    name?: string;
+    email?: string;
+    role?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    settingsService
+      .getProfile()
+      .then((res: any) => {
+        if (!active) return;
+        const data = res?.data || res;
+        if (data) {
+          setProfileFallback({
+            name: data.name || data.nama,
+            email: data.email,
+            role: data.role,
+          });
+        }
+      })
+      .catch(() => {
+        // Biarkan pakai data dari useAuth bila endpoint profil belum merespons
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const displayName =
+    user?.name || user?.nama || profileFallback?.name || 'Admin';
+  const displayEmail =
+    user?.email || profileFallback?.email || '-';
+  const displayRole =
+    user?.role || profileFallback?.role || 'Admin';
 
   // Ambil inisial nama untuk avatar (Contoh: "Admin UKu" menjadi "AU")
   const getInitials = (name: string) => {
-    if (!name) return 'US';
-    return name
-      .split(' ')
+    const clean = (name || 'Admin').trim();
+    if (!clean) return 'AD';
+    return clean
+      .split(/\s+/)
       .map((n) => n[0])
       .join('')
       .toUpperCase()
@@ -71,6 +107,7 @@ export default function Header() {
     } finally {
       // 1. Bersihkan semua data sesi di localStorage
       localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
       localStorage.removeItem('userName');
       localStorage.removeItem('userEmail');
@@ -101,6 +138,7 @@ export default function Header() {
         {/* Tombol Lonceng Notifikasi */}
         <div className="relative">
           <button
+            type="button"
             onClick={() => {
               setIsNotifOpen(!isNotifOpen);
               setIsProfileOpen(false);
@@ -126,6 +164,7 @@ export default function Header() {
                   </span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setUnreadCount(0)}
                   className="text-[11px] text-amber-600 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
                 >
@@ -172,23 +211,24 @@ export default function Header() {
         {/* Profil Admin & Dropdown Logout */}
         <div className="relative">
           <button
+            type="button"
             onClick={() => {
               setIsProfileOpen(!isProfileOpen);
               setIsNotifOpen(false);
             }}
             className="flex items-center gap-3 focus:outline-none hover:opacity-80 transition cursor-pointer p-1 rounded-xl"
           >
-            {/* 3. Avatar Dinamis berdasarkan nama user */}
+            {/* Avatar Dinamis berdasarkan nama user */}
             <div className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs">
-              {getInitials(user?.name || 'Budi Pratama')}
+              {getInitials(displayName)}
             </div>
             <div className="hidden sm:block text-left">
-              {/* 4. Nama Dinamis */}
+              {/* Nama Dinamis */}
               <p className="text-xs font-bold text-gray-800 leading-tight">
-                {user?.name || 'Budi Pratama'}
+                {displayName}
               </p>
-              {/* 5. Role Dinamis */}
-              <p className="text-[10px] text-gray-400">{user?.role || 'Admin'}</p>
+              {/* Role Dinamis */}
+              <p className="text-[10px] text-gray-400">{displayRole}</p>
             </div>
           </button>
 
@@ -197,9 +237,9 @@ export default function Header() {
             <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl border border-gray-200 shadow-2xl z-50 overflow-hidden">
               {/* Header Info Akun */}
               <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-                <p className="text-xs font-bold text-gray-800">{user?.name || 'Budi Pratama'}</p>
+                <p className="text-xs font-bold text-gray-800">{displayName}</p>
                 <p className="text-[11px] text-gray-500 truncate mt-0.5">
-                  {user?.email || 'admin@uku.id'}
+                  {displayEmail}
                 </p>
               </div>
 

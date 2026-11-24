@@ -19,16 +19,34 @@ export default function LoginForm({ onError }: LoginFormProps) {
 
     try {
       const response = await api.post('/auth/login', { email, password });
-      const token = response.data.token;
+      const token = response.data?.token;
+      const userData = response.data?.user || response.data?.data?.user || null;
 
       if (token) {
         localStorage.setItem('token', token);
         document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
 
-        if (response.data.user) {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
+        if (userData) {
+          const resolvedName = userData.name || userData.nama || '';
+          const resolvedEmail = userData.email || email;
+          const resolvedRole = userData.role || 'Admin';
+
+          localStorage.setItem(
+            'user',
+            JSON.stringify({
+              ...userData,
+              name: resolvedName,
+              nama: resolvedName,
+              email: resolvedEmail,
+              role: resolvedRole,
+            })
+          );
+          localStorage.setItem('userName', resolvedName);
+          localStorage.setItem('userEmail', resolvedEmail);
+          localStorage.setItem('userRole', resolvedRole);
         }
 
+        window.dispatchEvent(new Event('auth-updated'));
         window.location.href = '/dashboard';
       } else {
         onError('Token tidak ditemukan dari server.');

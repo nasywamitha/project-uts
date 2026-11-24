@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { UserCheck, KeyRound, ShieldCheck, LogOut } from 'lucide-react';
-import { settingsService } from '@/services/settingService';
+import { settingsService, AdminAccessItem, ActiveSessionItem } from '@/services/settingsService';
 
 // Import Komponen Tab Terpisah
 import AdminProfileTab from './components/AdminProfile';
@@ -20,20 +20,15 @@ function useSettings() {
     empId: '',
     status: '',
   });
-  const [roles] = useState([
-    { id: 1, name: 'Super Admin', members: 1, permissions: ['Semua Akses'] },
-    { id: 2, name: 'Admin Sistem', members: 2, permissions: ['Kelola Pengguna', 'Kelola Akses'] },
-  ]);
-  const [sessions, setSessions] = useState([
-    { id: 1, device: 'Chrome on Windows', location: 'Jakarta, ID', status: 'Aktif', lastActive: 'Baru saja' },
-    { id: 2, device: 'Safari on iPhone', location: 'Bandung, ID', status: 'Aman', lastActive: '10 menit lalu' },
-  ]);
+  const [admins, setAdmins] = useState<AdminAccessItem[]>([]);
+  const [sessions, setSessions] = useState<ActiveSessionItem[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
 
   // 1. Ambil data profil asli dari backend saat halaman pertama kali dibuka
   useEffect(() => {
-    settingsService.getProfile()
+    settingsService
+      .getProfile()
       .then((res: any) => {
         const data = res.data || res;
         setProfile(data);
@@ -43,7 +38,41 @@ function useSettings() {
       });
   }, []);
 
-  // 2. Fungsi Simpan yang terhubung langsung ke Backend & Database
+  // 2. Ambil daftar admin asli dari backend (role tunggal: Admin)
+  const refreshAdmins = useCallback(async () => {
+    try {
+      const data = await settingsService.getAdmins();
+      setAdmins(data);
+    } catch (err: any) {
+      console.error('Gagal memuat daftar admin:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'role') {
+      refreshAdmins();
+    }
+  }, [activeTab, refreshAdmins]);
+
+  // 2b. Ambil daftar perangkat/sesi aktif asli dari backend saat tab Logout Sesi dibuka
+  const refreshSessions = useCallback(async () => {
+    try {
+      const data = await settingsService.getSessions();
+      if (Array.isArray(data)) {
+        setSessions(data);
+      }
+    } catch (err: any) {
+      console.error('Gagal memuat daftar perangkat aktif:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'logout') {
+      refreshSessions();
+    }
+  }, [activeTab, refreshSessions]);
+
+  // 3. Fungsi Simpan Profil yang terhubung langsung ke Backend & Database
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -68,25 +97,28 @@ function useSettings() {
     setActiveTab,
     profile,
     setProfile,
-    roles,
+    admins,
+    refreshAdmins,
     sessions,
     setSessions,
+    refreshSessions,
     handleSave,
     isSaving,
   };
 }
 
 export default function SettingsPage() {
-  const { 
-    activeTab, 
-    setActiveTab, 
-    profile, 
-    setProfile, 
-    roles, 
-    sessions, 
+  const {
+    activeTab,
+    setActiveTab,
+    profile,
+    setProfile,
+    admins,
+    refreshAdmins,
+    sessions,
     setSessions,
-    handleSave, 
-    isSaving 
+    handleSave,
+    isSaving,
   } = useSettings();
 
   const tabs = [
@@ -101,7 +133,11 @@ export default function SettingsPage() {
       {/* Title */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
-          {activeTab === 'role' ? 'Manajemen Role & Hak Akses Admin' : activeTab === 'logout' ? 'Manajemen Sesi & Keamanan Logout' : 'Pengaturan Admin & Preferensi Sistem'}
+          {activeTab === 'role'
+            ? 'Manajemen Role & Hak Akses Admin'
+            : activeTab === 'logout'
+            ? 'Manajemen Sesi & Keamanan Logout'
+            : 'Pengaturan Admin & Preferensi Sistem'}
         </h1>
         <p className="text-xs text-gray-400 mt-1">
           Kelola profil kredensial, hak akses tim, dan sesi otentikasi aktif secara terpusat.
@@ -132,20 +168,20 @@ export default function SettingsPage() {
 
       {/* Tab Content Display dengan Props Data Backend */}
       {activeTab === 'profil' && (
-        <AdminProfileTab 
-          profile={profile} 
-          setProfile={setProfile} 
-          handleSave={handleSave} 
-          isSaving={isSaving} 
+        <AdminProfileTab
+          profile={profile}
+          setProfile={setProfile}
+          handleSave={handleSave}
+          isSaving={isSaving}
         />
       )}
-      
+
       {activeTab === 'password' && <ChangePasswordTab />}
-      
+
       {activeTab === 'role' && (
-        <RoleAccessTab roles={roles} />
+        <RoleAccessTab roles={admins} onRefresh={refreshAdmins} />
       )}
-      
+
       {activeTab === 'logout' && (
         <SessionLogoutTab sessions={sessions} setSessions={setSessions} />
       )}

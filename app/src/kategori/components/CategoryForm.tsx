@@ -1,39 +1,80 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
-import { createCategoryAction, ActionState } from '@/app/actions/category';
+import { useState, FormEvent } from 'react';
 import { ChevronDown } from 'lucide-react';
 import IconPicker from './IconPicker';
-
-const initialState: ActionState = {
-  success: false,
-  message: '',
-};
 
 interface CategoryFormProps {
   onSuccess?: () => void;
 }
 
-export default function CategoryForm({ onSuccess }: CategoryFormProps) {
-  const [state, formAction, isPending] = useActionState(createCategoryAction, initialState);
-  const [selectedIcon, setSelectedIcon] = useState('utensils');
+const API_URL = 'http://localhost:5001/api/categories/web';
 
-  useEffect(() => {
-    if (state.success && onSuccess) {
-      onSuccess();
+export default function CategoryForm({ onSuccess }: CategoryFormProps) {
+  const [name, setName] = useState('');
+  const [type, setType] = useState('');
+  const [selectedIcon, setSelectedIcon] = useState('utensils');
+  const [isPending, setIsPending] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    if (!name.trim() || !type) {
+      setErrorMessage('Nama dan tipe kategori wajib diisi.');
+      return;
     }
-  }, [state.success, onSuccess]);
+
+    setIsPending(true);
+    try {
+      const token =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('token') || localStorage.getItem('accessToken')
+          : null;
+
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          type,
+          icon: selectedIcon || 'utensils',
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setErrorMessage(data.message || 'Gagal menyimpan kategori.');
+        return;
+      }
+
+      setName('');
+      setType('');
+      setSelectedIcon('utensils');
+      onSuccess?.();
+    } catch (err) {
+      console.error('Error creating category:', err);
+      setErrorMessage('Terjadi kesalahan saat menghubungi server.');
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <h2 className="text-base font-bold text-gray-800">Tambah Kategori Baru</h2>
         <p className="text-xs text-gray-400 mt-0.5">Masukkan nama, tipe, dan ikon kategori keuangan.</p>
       </div>
 
-      {state.message && (
-        <div className={`p-3 text-xs rounded-xl font-medium ${state.success ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
-          {state.message}
+      {errorMessage && (
+        <div className="p-3 text-xs rounded-xl font-medium bg-red-50 text-red-500">
+          {errorMessage}
         </div>
       )}
 
@@ -43,13 +84,12 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
         <input
           type="text"
           name="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           placeholder="Contoh: Makanan, Transport"
           required
           className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-xs text-gray-800 shadow-xs focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
         />
-        {state.errors?.name && (
-          <p className="text-[11px] text-red-500 font-medium">{state.errors.name[0]}</p>
-        )}
       </div>
 
       {/* Pilihan Tipe Kategori */}
@@ -58,7 +98,8 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
         <div className="relative">
           <select
             name="type"
-            defaultValue=""
+            value={type}
+            onChange={(e) => setType(e.target.value)}
             required
             className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 pr-10 text-xs text-gray-800 shadow-xs focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white appearance-none cursor-pointer"
           >
@@ -70,15 +111,11 @@ export default function CategoryForm({ onSuccess }: CategoryFormProps) {
             <ChevronDown className="w-4 h-4" />
           </div>
         </div>
-        {state.errors?.type && (
-          <p className="text-[11px] text-red-500 font-medium">{state.errors.type[0]}</p>
-        )}
       </div>
 
       {/* Pilihan Ikon Kategori */}
       <div className="space-y-1.5">
         <label className="block text-xs font-bold text-gray-700">Ikon Kategori</label>
-        <input type="hidden" name="icon" value={selectedIcon} />
         <IconPicker value={selectedIcon} onChange={setSelectedIcon} />
       </div>
 
